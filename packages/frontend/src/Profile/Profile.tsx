@@ -1,10 +1,13 @@
+/* eslint-disable */
 import './Profile.css';
-
+import detectEthereumProvider from '@metamask/detect-provider'
 import jwtDecode from 'jwt-decode';
 import React, { useState, useEffect } from 'react';
 import Blockies from 'react-blockies';
+import axios from 'axios';
 
 import { Auth } from '../types';
+// import { Add } from '../Add/Add';
 
 interface Props {
 	auth: Auth;
@@ -17,7 +20,9 @@ interface State {
 		id: number;
 		username: string;
 	};
-	username: string;
+	// username: string;
+	tokenName: string;
+	tokenAddress: string;
 }
 
 interface JwtDecoded {
@@ -31,8 +36,12 @@ export const Profile = ({ auth, onLoggedOut }: Props): JSX.Element => {
 	const [state, setState] = useState<State>({
 		loading: false,
 		user: undefined,
-		username: '',
+		// username: '',
+		tokenName: '',
+		tokenAddress: ''
 	});
+
+	const [loader, showLoader] = useState(false);
 
 	useEffect(() => {
 		const { accessToken } = auth;
@@ -53,36 +62,7 @@ export const Profile = ({ auth, onLoggedOut }: Props): JSX.Element => {
 	const handleChange = ({
 		target: { value },
 	}: React.ChangeEvent<HTMLInputElement>) => {
-		setState({ ...state, username: value });
-	};
-
-	const handleSubmit = () => {
-		const { accessToken } = auth;
-		const { user, username } = state;
-
-		setState({ ...state, loading: true });
-
-		if (!user) {
-			window.alert(
-				'The user id has not been fetched yet. Please try again in 5 seconds.'
-			);
-			return;
-		}
-
-		fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${user.id}`, {
-			body: JSON.stringify({ username }),
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-				'Content-Type': 'application/json',
-			},
-			method: 'PATCH',
-		})
-			.then((response) => response.json())
-			.then((user) => setState({ ...state, loading: false, user }))
-			.catch((err) => {
-				window.alert(err);
-				setState({ ...state, loading: false });
-			});
+		setState({ ...state, tokenName: value });
 	};
 
 	const { accessToken } = auth;
@@ -95,24 +75,30 @@ export const Profile = ({ auth, onLoggedOut }: Props): JSX.Element => {
 
 	const username = user && user.username;
 
+	const addToken = () => {
+		showLoader(true);
+		axios.get("http://localhost:3001")
+		.then((response) => {
+			console.log(response.data)
+			alert(response.data);
+			showLoader(false)
+		})
+		.catch((err) => alert(err))
+	}
+
 	return (
 		<div className="Profile">
-			<p>
-				Logged in as <Blockies seed={publicAddress} />
-			</p>
 			<div>
-				My username is {username ? <pre>{username}</pre> : 'not set.'}{' '}
-				My publicAddress is <pre>{publicAddress}</pre>
+				Mi dirección es <pre>{publicAddress}</pre>
 			</div>
-			<div>
-				<label htmlFor="username">Change username: </label>
-				<input name="username" onChange={handleChange} />
-				<button disabled={loading} onClick={handleSubmit}>
-					Submit
-				</button>
-			</div>
+			<br />
+			{
+				loader ? 
+				<div>Cargando...</div>
+				: <button onClick={addToken}>Agregar token</button>
+			}
 			<p>
-				<button onClick={onLoggedOut}>Logout</button>
+				<button onClick={onLoggedOut}>Cerrar sesión</button>
 			</p>
 		</div>
 	);

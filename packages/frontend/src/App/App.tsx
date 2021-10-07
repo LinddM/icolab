@@ -1,3 +1,4 @@
+/* eslint-disable */
 import './App.css';
 
 import React, { useEffect, useState } from 'react';
@@ -5,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { Login } from '../Login';
 import { Profile } from '../Profile/Profile';
 import { Auth } from '../types';
-import logo from './logo.svg';
+import logo from './metamask-logo.svg';
 
 const LS_KEY = 'login-with-metamask:auth';
 
@@ -40,7 +41,7 @@ export const App = (): JSX.Element => {
 			<header className="App-header">
 				<img src={logo} className="App-logo" alt="logo" />
 				<h1 className="App-title">
-					Welcome to Login with MetaMask Demo
+					Bienvenido a mi ICO
 				</h1>
 			</header>
 			<div className="App-intro">
